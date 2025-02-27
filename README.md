@@ -1,46 +1,177 @@
-# Getting Started with Create React App
+# React Hooks ব্যাখ্যা (Bangla)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+এই ডকুমেন্টে আমরা **React Hooks** সম্পর্কে আলোচনা করবো, বিশেষ করে তিনটি গুরুত্বপূর্ণ হুক: `useState`, `useEffect`, এবং `useRef`। এছাড়াও `useEffect` দিয়ে API কলের দুটি উদাহরণ থাকবে।
 
-## Available Scripts
+## ১ useState Hook
 
-In the project directory, you can run:
+### **ব্যাখ্যা:**
+`useState` হল একটি React Hook যা কম্পোনেন্টের **স্টেট পরিচালনার** জন্য ব্যবহৃত হয়। এটি একটি ভেরিয়েবল এবং একটি সেটার ফাংশন রিটার্ন করে, যা ব্যবহার করে আমরা স্টেট আপডেট করতে পারি।
 
-### `npm start`
+### **Syntax:**
+```tsx
+const [state, setState] = useState(initialValue);
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### **উদাহরণ:** (একটি কাউন্টার কম্পোনেন্ট)
+```tsx
+import { useState } from "react";
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+const Counter = () => {
+  const [count, setCount] = useState<number>(0);
 
-### `npm test`
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={() => setCount(count + 1)}>Increase</button>
+    </div>
+  );
+};
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+export default Counter;
+```
 
-### `npm run build`
+---
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## ২useEffect Hook
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### **ব্যাখ্যা:**
+`useEffect` হল একটি React Hook যা **সাইড ইফেক্ট পরিচালনার** জন্য ব্যবহৃত হয়। যেমনঃ API কল, লোকাল স্টোরেজ আপডেট, অথবা DOM পরিবর্তন।
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### **Syntax:**
+```tsx
+useEffect(() => {
+  // কোড এখানে লিখুন
+  return () => {
+    // Cleanup কোড (যদি প্রয়োজন হয়)
+  };
+}, [dependencies]);
+```
 
-### `npm run eject`
+### **উদাহরণ ১:** (API থেকে ডাটা লোড করা)
+```tsx
+import { useState, useEffect } from "react";
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+const FetchData = () => {
+  const [data, setData] = useState<any>(null);
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+  useEffect(() => {
+    fetch("https://jsonplaceholder.typicode.com/posts/1")
+      .then((response) => response.json())
+      .then((json) => setData(json));
+  }, []);
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+  return (
+    <div>
+      <h2>Data:</h2>
+      <pre>{JSON.stringify(data, null, 2)}</pre>
+    </div>
+  );
+};
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+export default FetchData;
+```
 
-## Learn More
+### **উদাহরণ ২:** (ইন্টারভ্যাল ব্যবহার করে টাইমার চালানো)
+```tsx
+import { useState, useEffect } from "react";
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+const Timer = () => {
+  const [seconds, setSeconds] = useState<number>(0);
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSeconds((prev) => prev + 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return <p>Elapsed Time: {seconds} seconds</p>;
+};
+
+export default Timer;
+```
+
+---
+
+## ৩useRef Hook
+
+### **ব্যাখ্যা:**
+`useRef` হল একটি React Hook যা **DOM reference সংরক্ষণ** করতে এবং এমন ভ্যালু ম্যানেজ করতে ব্যবহৃত হয় যা **রি-রেন্ডার ছাড়াই পরিবর্তন** হতে পারে।
+
+### **Syntax:**
+```tsx
+const ref = useRef<HTMLElement | null>(null);
+```
+
+### **উদাহরণ ১:** (ইনপুট ফিল্ডে অটোমেটিক ফোকাস করা)
+```tsx
+import { useRef } from "react";
+
+const InputFocus = () => {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleFocus = () => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  };
+
+  return (
+    <div>
+      <input ref={inputRef} type="text" placeholder="Type something..." />
+      <button onClick={handleFocus}>Focus Input</button>
+    </div>
+  );
+};
+
+export default InputFocus;
+```
+
+### **উদাহরণ ২:** (স্টেট ছাড়া ভ্যালু সংরক্ষণ করা)
+```tsx
+import { useRef, useState } from "react";
+
+const ClickCounter = () => {
+  const [count, setCount] = useState<number>(0);
+  const countRef = useRef<number>(0);
+
+  const handleClick = () => {
+    setCount(count + 1);
+    countRef.current += 1;
+    console.log("Ref Count:", countRef.current);
+  };
+
+  return (
+    <div>
+      <p>State Count: {count}</p>
+      <p>Ref Count (no re-render): {countRef.current}</p>
+      <button onClick={handleClick}>Increase</button>
+    </div>
+  );
+};
+
+export default ClickCounter;
+```
+
+---
+
+## 🎥 ভিডিও রেফারেন্স
+
+- **useState Hook:** [ভিডিও লিংক](https://www.youtube.com/watch?v=6tni9ZhMcPM&t=51s)
+- **useEffect Hook:** [ভিডিও লিংক](https://www.youtube.com/watch?v=vVwCyii5GJk&t=1209s)
+- **useRef Hook:** [ভিডিও লিংক](https://www.youtube.com/watch?v=sXkyogEPiqQ&t=11s)
+
+---
+
+## **সংক্ষেপে**
+| Hook | কাজ | ব্যবহারের ক্ষেত্র |
+|------|------|----------------|
+| `useState` | স্টেট পরিচালনা করে | কাউন্টার, ইনপুট হ্যান্ডলিং |
+| `useEffect` | সাইড ইফেক্ট পরিচালনা করে | API কল, টাইমার |
+| `useRef` | DOM reference সংরক্ষণ ও mutable value হ্যান্ডলিং করে | ইনপুট ফোকাস, রি-রেন্ডার ছাড়া ডাটা সংরক্ষণ |
+
+এই ডকুমেন্টটি পড়ার জন্য ধন্যবাদ! 🚀
+
+---
+
